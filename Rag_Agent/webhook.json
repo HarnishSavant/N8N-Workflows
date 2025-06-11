@@ -1,0 +1,117 @@
+{
+  "name": "webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mychatapp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "22bf3aee-4bbd-42bc-9320-e6af6e5312a3",
+      "name": "Webhook",
+      "webhookId": "427cb2e2-51a9-43c3-907d-8d1f8c2742b6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "= {{ $json.body.message }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        220,
+        0
+      ],
+      "id": "d0e084ce-100e-4c8b-aba4-adf9bb4ce19a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        260,
+        220
+      ],
+      "id": "e0d59f13-64f3-475c-b675-ba37eccd6982",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "TT9iGNjQ5mJlgAoO",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [
+        620,
+        -20
+      ],
+      "id": "f31ad760-5544-48c6-83d3-f51fe06b6ce3",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "29edd4d6-3377-49af-8e21-50ab7494baa0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "49078af902dd73f909b4ac37f29f0a031960223ce2c5268b8076e929210e6d58"
+  },
+  "id": "IIP43CEMCeodmVuU",
+  "tags": []
+}

@@ -1,0 +1,576 @@
+{
+  "name": "Hr Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -280,
+        20
+      ],
+      "id": "7a96de9a-0d7b-4e18-98b3-cdd6236195f8",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "z0cu4dwqiT9mOWH6",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Apply",
+              "description": "Contains a Job apllication from a candidate seeking a possition at our organization"
+            },
+            {
+              "category": "Doesn't apply ",
+              "description": "This candidate is not applying for job"
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "Please classify the text provided by the user into one of the following categories: {categories}, and use the provided formatting instructions below. Don't explain, and only output the json."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        20
+      ],
+      "id": "dc0a32ce-6309-4f70-8f3c-dd7c4bb78530",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        28,
+        240
+      ],
+      "id": "c9cd5454-7782-4137-82b9-be72c92a7cb8",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "TT9iGNjQ5mJlgAoO",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        316,
+        120
+      ],
+      "id": "5f15962f-83ea-4267-a553-5dc44b1b5af3",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "attachment_0",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "acdc3b2d-d98b-4f55-ad04-fba6d3ac348c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c1adb1c-6122-4894-bccf-04c1042d7bfa",
+                    "leftValue": "attachment_0",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        316,
+        -80
+      ],
+      "id": "848a6b38-b71b-4254-b1f2-ad9967ab171b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "attachment_0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        756,
+        20
+      ],
+      "id": "18640220-5bbd-46ce-aa0d-323e51a15525",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "attachment_0",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1YhfDkn8_2MgCaFYyLkjkwC8sjryWicc_",
+          "mode": "list",
+          "cachedResultName": "knowlage",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1YhfDkn8_2MgCaFYyLkjkwC8sjryWicc_"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        536,
+        -180
+      ],
+      "id": "681dc799-9395-4d42-aacb-719ce64674a7",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HLllez9WTrSAMcFB",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        756,
+        -180
+      ],
+      "id": "8a636b51-20b6-4c5d-9fc8-49f80d9bb320",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HLllez9WTrSAMcFB",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        976,
+        -80
+      ],
+      "id": "1cd9ad04-2594-4ba0-8bc1-ba1fa9de55d3",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=  Analayze the current information from the recived candidate and score between 0 to 10 said candidate, 0 meaning not a good fit for the posstion , 10 being outstanding for the job .\n\nThe actual position being open is:\nJob Title: Data Analyst\nLocation: [Insert Location or \"Remote\"]\nEmployment Type: Full-time\n\nCompany Overview:\n[Company Name] is a dynamic and data-driven organization focused on delivering innovative solutions through the power of analytics and technology. We are seeking a motivated and detail-oriented Data Analyst to join our team and help transform data into actionable insights that drive strategic decision-making.\n\nJob Summary:\nThe Data Analyst will be responsible for collecting, processing, and analyzing large sets of data to identify trends, patterns, and business insights. You will work closely with stakeholders to develop dashboards, reports, and predictive models that support key business initiatives.\n\nKey Responsibilities:\n\nCollect and clean data from various sources (databases, APIs, spreadsheets, etc.)\n\nAnalyze data to identify trends, patterns, and opportunities for improvement\n\nCreate reports and dashboards using tools like Power BI, Tableau, or Excel\n\nCollaborate with cross-functional teams to understand data needs and provide analytical support\n\nMonitor data quality and ensure data integrity\n\nPerform ad hoc data analysis to support business objectives\n\nUse SQL, Python, or R to perform advanced data manipulation and modeling\n\nPresent findings to management and stakeholders in a clear, visual, and actionable way\n\nRequired Skills & Qualifications:\n\nBachelor's degree in Data Science, Computer Science, Statistics, Economics, or a related field\n\nProficiency in SQL and Excel\n\nExperience with data visualization tools (Tableau, Power BI, or similar)\n\nWorking knowledge of Python or R for data analysis\n\nStrong analytical and problem-solving skills\n\nExcellent communication and presentation abilities\n\nPreferred Qualifications:\n\nExperience working with large datasets and cloud-based platforms (e.g., AWS, Google Cloud)\n\nKnowledge of statistical analysis and A/B testing\n\nFamiliarity with ETL tools and data pipelines\n\nTools & Technologies:\nSQL, Python, Excel, Tableau/Power BI, Google Analytics, Jupyter, Git\n\nBenefits:\n\nCompetitive salary and performance-based bonuses\n\nFlexible work hours and remote-friendly environment\n\nHealth insurance, paid time off, and career development programs\n\n\n\nsee the extrected pdf information:{{ $json.text }}\n\nprovide some key insight on why this candidate is good fit for the posstion as well ",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "you are a helpful HR assistant. your goal is to analyze the cv of the candidate and see if the candidate is a good candidate for the possttion."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        1196,
+        -80
+      ],
+      "id": "be7a1f23-39a5-45e7-9725-a7aa9dc6f051",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1224,
+        140
+      ],
+      "id": "15c2b9ae-16da-40e6-9b1b-9e0d285e7a5e",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "TT9iGNjQ5mJlgAoO",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\"candidate\": {\n\"first_name\": \"string\",\n\"last_name\": \"string\",\n\"email\": \"string\",\n\"location\": \"string\",\n\"phone\":\"string\"\n},\n\"summary\": {\n\"years_experience\": \"number\",\n\"current_role\": \"string\",\n\"key_achievements\": [\"string\"],\n\"technical_skills\": [\"string\"]\n},\n\"fit_score\": {\n\"overall\": \"number\",\n\"breakdown\": {\n\"experience\": \"number\",\n\"technical_skills\": \"number\",\n\"achievements\": \"number\",\n\"education\": \"number\"\n},\n\"reasons\": [\"string\"]\n}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1344,
+        140
+      ],
+      "id": "45492c89-ef06-47f5-a31a-8114e74083b4",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1UQAxvctYxfAKhIbloAgCUH274Hx_92L3hL15kHFTLh8",
+          "mode": "list",
+          "cachedResultName": "Hr",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UQAxvctYxfAKhIbloAgCUH274Hx_92L3hL15kHFTLh8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UQAxvctYxfAKhIbloAgCUH274Hx_92L3hL15kHFTLh8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "First Name ": "={{ $json.output.candidate.first_name }}",
+            "Last Name": "={{ $json.output.candidate.last_name }}",
+            "Email": "={{ $json.output.candidate.email }}",
+            "Email conteent": "={{ $('Gmail Trigger').item.json.text }}",
+            "Summary": "={{ $json.output.summary.years_experience }} of {{ $json.output.summary.current_role }}",
+            "CV": "={{ $('Google Drive').item.json.webViewLink }}",
+            "Scoring ": "=Overall score : {{ $json.output.fit_score.overall }}\n\n",
+            "Quick Read": "={{ $json.output.fit_score.reasons[0] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "First Name ",
+              "displayName": "First Name ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email conteent",
+              "displayName": "Email conteent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CV",
+              "displayName": "CV",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Scoring ",
+              "displayName": "Scoring ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quick Read",
+              "displayName": "Quick Read",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1572,
+        -80
+      ],
+      "id": "590d47ca-774c-4068-b936-b02d31260f61",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VQ9oltTtZbmKR1MN",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9c721900-e326-4b37-ada0-2b147b368e4a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "49078af902dd73f909b4ac37f29f0a031960223ce2c5268b8076e929210e6d58"
+  },
+  "id": "SSdHTjkhpQJSNbdL",
+  "tags": []
+}

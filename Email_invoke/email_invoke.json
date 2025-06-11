@@ -1,0 +1,318 @@
+{
+  "name": "email invoke",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2bf58b35-4f5c-4da3-a815-29521500fea5",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "filters": {
+          "labelIds": [
+            "UNREAD"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "d2187838-8f8f-4384-95cb-da968ed05024",
+      "name": "Gmail all mails",
+      "webhookId": "02273b07-112c-4380-8f2d-69e103b5220b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "uNU1fvhpVXkJZtYf",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.threadId }}",
+        "simple": false,
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "706c5c6b-8519-4a75-8283-f19d1ad74d83",
+      "name": "Gmail all details",
+      "webhookId": "7367d99c-0472-455d-82ad-955edae2d99b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "uNU1fvhpVXkJZtYf",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Subject :{{ $json.headers.subject }}\n\nEmail Body :{{ $json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a helpful <Agentinstruction>\n    <Role>\n        <name>Email Reply Agent</name>\n        <Description>A helpful Emain Reply Agent</Description>\n    </Role>\n    <Goal>\n        <pimary>Draft custom but very professional email replies which are 100% humanlike.</pimary>\n        <secoandary>as an email reply you should not only reply but also build trust and reputation with the person you replying to</secoandary>\n    </Goal>\n    <instructions>\n        <instruction>once you recive the email, you should throughly understand and analyse the subject line and full email body message</instruction>\n        <instruction>After you read the email, review <Details> and <Aims> to understnad the context of the user before drafting reply</instrction>\n        <instruction>Draft a professional Reply using<usinginfo>. use age where necessary</instruction>\n    </instructions>\n    <userinfo>\n        <Details>\n            <Detail name=\"user name\">Harnish Savant</Detail>\n            <Detail name=\"Company\">AI Learners india</Detail>\n            <Detail name=\"Age\">22</Detail>\n            <Detail name=\"Contect info\">8866451408</Detail>\n        </Details>\n        <Aims>\n            <Aim name=\"Mission\">wants to teach Ai to people in the most simple way.</Aim>\n            <Aim name=\"Focus\">Rightnow focussing more on Teaching rather than collabs and promotions.</Aim>\n            <Aim name=\"Community Focus\">Focus on community Right now</Aim>\n        </Aims>\n    </userinfo>\n    <Example>\n        <UserInput>\n        subject : Promotion message\n        THis message is regarding a Promotion that we are going on doing\n        </UserInput>\n        <UserOutput>\n                    Subject: Re: Promotion Message\n\n            Dear [Sender's Name],\n\n            Thank you for reaching out and sharing the details regarding your upcoming promotion.\n\n            At AI Learners India, our current priority is deeply rooted in building a strong, value-driven AI learning community. As part of our mission, we are dedicated to teaching AI in the simplest and most accessible way possible, especially for those just beginning their journey in this space.\n\n            While we truly appreciate your interest in collaborating for a promotion, we are presently focused on educational initiatives and student engagement, rather than active promotional or marketing partnerships. That said, we always welcome meaningful collaborations in the future that align with our core values and educational goals.\n\n            Please feel free to share more about your promotion campaign, including its objectives, audience, and potential value to our learner community. If it aligns well with our educational direction, we’d be happy to revisit the conversation at a later stage.\n\n            Wishing you all the best for your ongoing campaign!\n\n            Warm regards,\n            Harnish Savant\n            Founder, AI Learners India\n            📞 +91 88664 51408\n        </UserOutput>\n        <UserOutput>\n                Subject: Re: Regarding the Project Details\n\n        Dear [Sender's Name],\n\n        Thank you for your message and for sharing your interest in discussing project details.\n\n        At AI Learners India, we’re currently focused on delivering clear, practical, and impactful AI education to learners across all levels. As part of this mission, we always welcome opportunities that resonate with our educational goals and community-first approach.\n\n        I’d be happy to review the project details you have in mind. Could you please share more information regarding the scope, objectives, timeline, and how it potentially aligns with our current focus on AI education? This will help us evaluate how best we can contribute or collaborate.\n\n        Looking forward to understanding more and exploring how we can move ahead meaningfully.\n\n        Warm regards,\n        Harnish Savant\n        Founder, AI Learners India\n        📞 +91 88664 51408\n\n\n        </UserOutput>\n        <UserOutput>\n                    Subject: Re: Job Interview\n\n            Dear [Sender's Name],\n\n            Thank you for reaching out regarding the job interview opportunity.\n\n            At AI Learners India, we are always excited to connect with passionate individuals who are eager to contribute to the field of AI education. As someone focused on making AI simple and accessible to all, our team values purpose-driven work, community commitment, and a genuine passion for teaching.\n\n            Please do share the complete interview details—including the role, format, preferred dates, and any materials you’d like me to review beforehand. I’d be happy to coordinate and ensure a meaningful conversation that aligns with your expectations.\n\n            Looking forward to hearing from you.\n\n            Warm regards,\n            Harnish Savant\n            Founder, AI Learners India\n            📞 +91 88664 51408\n\n\n        </UserOutput>\n    </Example>\n</Agentinstruction>\nassistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        660,
+        0
+      ],
+      "id": "e47a04ca-97b0-460f-81b7-04c12346fe81",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        700,
+        220
+      ],
+      "id": "645cba87-a302-44a0-b114-e0ec5daad776",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "j4aTmzkIjZt569Be",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appQhsFPw3uZPdoA0",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://airtable.com/appQhsFPw3uZPdoA0"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbljLLDYjqD7YPzDu",
+          "mode": "list",
+          "cachedResultName": "mail",
+          "cachedResultUrl": "https://airtable.com/appQhsFPw3uZPdoA0/tbljLLDYjqD7YPzDu"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Sender Name": "={{ $('Gmail all details').item.json.from.value[0].name }}",
+            "From Email": "={{ $('Gmail all details').item.json.from.value[0].address }}",
+            "Email Body": "={{ $('Gmail all details').item.json.text }}",
+            "Body Draft Reply": "={{ $json.output }}",
+            "Thread ID": "={{ $('Gmail all details').item.json.threadId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Sender Name",
+              "displayName": "Sender Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "From Email",
+              "displayName": "From Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email Body",
+              "displayName": "Email Body",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Body Draft Reply",
+              "displayName": "Body Draft Reply",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Thread ID",
+              "displayName": "Thread ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1020,
+        0
+      ],
+      "id": "6b2e5956-28a4-4261-bff6-e2ebeef63b99",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "OrMbCCc0CMOoGOtr",
+          "name": "Airtable Personal Access Token account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.fields['Thread ID'] }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1240,
+        0
+      ],
+      "id": "491efeed-6a94-4076-85ad-6a35f34bf14e",
+      "name": "Gmail",
+      "webhookId": "9e7c3ae9-f70c-41a8-b2b1-c26e7fa90d19",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "uNU1fvhpVXkJZtYf",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail all mails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail all mails": {
+      "main": [
+        [
+          {
+            "node": "Gmail all details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail all details": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8e4d50fb-cbc4-4863-aa57-b478ff54162a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "49078af902dd73f909b4ac37f29f0a031960223ce2c5268b8076e929210e6d58"
+  },
+  "id": "CrEWFsKu3IPSPSUv",
+  "tags": []
+}
